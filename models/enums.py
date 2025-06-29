@@ -6,11 +6,18 @@ class UserRole(StrEnum):
     REP = "REP"
 
 class TaskType(StrEnum):
-    CALL = "CALL"
+    TRAINING = "TRAINING"
     VISIT = "VISIT"
+    FEEDBACK = "FEEDBACK"
     DELIVERY = "DELIVERY"
 
 class TaskStatus(StrEnum):
     PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
     DONE = "DONE"
-    CANCELLED = "CANCELLED"
+    CANCELED = "CANCELED"
+
+class Marketing(StrEnum):
+    YES = "yes"
+    PARTIAL = "partial"
+    NO = "no"

@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 
 from .base import TimestampMixin, Base
 
-class Partner(Base, TimestampMixin):
+class Partner(Base):
     __tablename__ = "partners"
 
     id = Column(Integer, primary_key=True)
@@ -13,7 +13,6 @@ class Partner(Base, TimestampMixin):
     contact_name = Column(String(120), nullable=True)
     contact_phone = Column(String(30), nullable=True)
     active = Column(Boolean, default=True, nullable=False)
-
     # relationships
     tasks = relationship("Task", back_populates="partner", cascade="all, delete-orphan")
     visits = relationship("Visit", back_populates="partner", cascade="all, delete-orphan")

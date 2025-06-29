@@ -1,20 +1,36 @@
-from aiogram import Router
-from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram import Router, F
+from aiogram.types import CallbackQuery
+from babel.dates import format_date
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.visit import Visit
-from models.partner import Partner
-from models.competitor_offer import CompetitorOffer
+from models import User, Visit
 
 router = Router()
 
-@router.message(Command("stats"))
-async def command_stats(message: Message, session: AsyncSession):
-    # Простейший пример статистики по текущему месяцу
-    month_start = message.date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    visits_q = select(func.count()).where(Visit.rep_id == message.from_user.id, Visit.visited_at >= month_start)
-    visits_cnt = (await session.execute(visits_q)).scalar_one()
-    text = f"Отчёт за {message.date:%B}:\n• Визитов: {visits_cnt}"
-    await message.answer(text)
+@router.callback_query(F.data == "stats")
+async def command_stats(callback: CallbackQuery, session: AsyncSession):
+    # 1. начало текущего месяца (время в msg.date уже UTC с tzinfo)
+    month_start = callback.message.date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # 2. считаем визиты: JOIN users → visits по user.id = visit.rep_id
+    visits_q = (
+        select(func.count())
+        .select_from(Visit)
+        .join(User, User.id == Visit.rep_id)
+        .where(
+            User.telegram_id == callback.from_user.id,   # ← фильтр по telegram_id
+            Visit.visited_at >= month_start,
+        )
+    )
+
+    visits_cnt: int = await session.scalar(visits_q)
+
+    # 3. аккуратное название месяца на русском
+    month_name_ru = format_date(callback.message.date, "LLLL", locale="ru").capitalize()
+
+    text = (
+        f"Отчёт за {month_name_ru}:\n"
+        f"• Визитов: {visits_cnt}"
+    )
+    await callback.message.answer(text)

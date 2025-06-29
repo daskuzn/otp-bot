@@ -23,6 +23,13 @@ class Task(Base, TimestampMixin):
 
     rep = relationship("User", back_populates="tasks")
     partner = relationship("Partner", back_populates="tasks")
+    report = relationship(
+        "Report",
+        back_populates="task",
+        uselist=False,          # ← один Report
+        cascade="all, delete-orphan",  # опционально
+    )
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"<Task id={self.id} rep={self.rep_id} partner={self.partner_id}>"
+    

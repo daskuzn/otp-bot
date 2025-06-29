@@ -2,10 +2,9 @@ from .enums import UserRole, TaskType, TaskStatus
 from .user import User
 from .partner import Partner
 from .visit import Visit
-from .competitor_offer import CompetitorOffer
-from .satisfaction_survey import SatisfactionSurvey
-from .task import Task
 from .base import Base
+from .report import Report
+from .task import Task
 
 __all__ = [
     "UserRole",
@@ -14,8 +13,7 @@ __all__ = [
     "User",
     "Partner",
     "Visit",
-    "CompetitorOffer",
-    "SatisfactionSurvey",
     "Task",
     "Base",
+    "Report",
 ]
