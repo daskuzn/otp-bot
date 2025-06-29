@@ -1,30 +1,27 @@
-import datetime
-
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 
-from .base import TimestampMixin, Base
+from .base import Base
 
-class Visit(Base, TimestampMixin):
+class Visit(Base):
     __tablename__ = "visits"
 
     id = Column(Integer, primary_key=True)
     rep_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     partner_id = Column(Integer, ForeignKey("partners.id", ondelete="CASCADE"), nullable=False)
-    visited_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), nullable=False)
-    marketing_checked = Column(Boolean, default=False, nullable=False)
-    satisfaction_done = Column(Boolean, default=False, nullable=False)
-    competitor_logged = Column(Boolean, default=False, nullable=False)
+    visited_at = Column(DateTime(timezone=True), nullable=False)
+    marketing_checked = Column(Boolean, default=False, nullable=True)
+    satisfaction_done = Column(Boolean, default=False, nullable=True)
+    competitor_logged = Column(Boolean, default=False, nullable=True)
     notes = Column(Text, nullable=True)
+    report_id = Column(Integer, ForeignKey("report.id", ondelete="CASCADE"), nullable=False)
 
     # relationships
     rep = relationship("User", back_populates="visits")
     partner = relationship("Partner", back_populates="visits")
-    competitor_offers = relationship(
-        "CompetitorOffer", back_populates="visit", cascade="all, delete-orphan"
-    )
-    satisfaction_surveys = relationship(
-        "SatisfactionSurvey", back_populates="visit", cascade="all, delete-orphan"
+    
+    report = relationship(
+        "Report", back_populates="visit"
     )
 
     def __repr__(self) -> str:  # pragma: no cover
