@@ -1,4 +1,4 @@
-config.py
+.env
 .venv
 *test*
 __pycache__/
